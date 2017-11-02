@@ -31,5 +31,5 @@ the variations you used and how these variations impacted solution quality. Subm
 with your code and the answer to the solution you get on the test file.
 
 #### Scoring
-+3 points for coding up a genetic algorithm
++3 points for coding up a genetic algorithm\n
 +2 point for exploring how variations of the algorithm impact solution quality 
