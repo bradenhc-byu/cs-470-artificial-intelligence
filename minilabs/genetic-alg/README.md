@@ -7,7 +7,7 @@
 *This lab has been adapted from an assignment given at Harvard:
 http://www.people.fas.harvard.edu/~albert/cscie220/Asst7.pdf*
 
-####Description
+#### Description
 Write code for a genetic algorithm to solve the Knapsack Problem:. Briefly stated, the Knapsack
 Problem is as follows:
 
@@ -25,11 +25,11 @@ algorithms are found in Section 4.1.4 in your book. Read up on exactly how to im
 genetic algorithm, and then code it up. Try it out on this test file (the format is a little strange,
 but you should be able to figure it out easily).
 
-####Deliverables
+#### Deliverables
 Create a short write-up that documents the parameters you used in your algorithm. Document
 the variations you used and how these variations impacted solution quality. Submit this write-up
 with your code and the answer to the solution you get on the test file.
 
-####Scoring
+#### Scoring
 +3 points for coding up a genetic algorithm
 +2 point for exploring how variations of the algorithm impact solution quality 
