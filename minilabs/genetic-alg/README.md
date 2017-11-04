@@ -32,4 +32,5 @@ with your code and the answer to the solution you get on the test file.
 
 #### Scoring
 +3 points for coding up a genetic algorithm
+
 +2 point for exploring how variations of the algorithm impact solution quality 
