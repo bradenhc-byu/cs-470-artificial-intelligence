@@ -6,6 +6,7 @@ import copy
 import random
 import numpy
 import logging
+import math
 from collections import defaultdict
 
 
@@ -122,15 +123,91 @@ def parse_knapsack(filename):
             max_weight = int(input_file.readline().rstrip())
             for line in input_file:
                 parts = line.split()
-                objects.append(int(parts[0]), int(parts[1]))
+                objects.append((int(parts[0]), int(parts[1])))
             input_file.close()
         return max_weight, objects
 
 
 # ------------------------------------------------------------------------------
+# Algorithm Helper Functions
+#
+def sa_cost_value(knapsack):
+    """
+    Evaluates the cost of a knapsack solution based on the overall value
+
+    :param knapsack: The knapsack object to evaluate
+    :return: The value of the knapsack
+    """
+    return knapsack.value()
+
+
+def sa_cost_weight(knapsack):
+    """
+    Evaluates the cost of a knapsack solution based on the overall weight
+
+    :param knapsack: The knapsack object to evaluate
+    :return: The weight of the knapsack
+    """
+    return knapsack.weight()
+
+
+def sa_cost_combo(knapsack):
+    """
+    Evaluates the cost of a knapsack solution based on a combination of overall
+    value and weight. Uses simple fractional math.
+
+    :param knapsack: The knapsack object to evaluate
+    :return: The cost of the knapsack in terms of weight and value
+    """
+    return int(float(float(knapsack.weight()*2.0) / float(
+        knapsack.max_weight()))
+               * float(knapsack.value()))
+
+
+def sa_neighbor(knapsack, objects):
+    """
+    Generates a random neighbor to the provided knapsack by only changing one
+    of the objects in the knapsack
+
+    :param knapsack: The knapsack object that needs a neighbor
+    :param objects: The list of available objects
+    :return: A new knapsack object that is a neighbor to the original
+    """
+    neighbor = Knapsack(knapsack.objects(), knapsack.weight(), knapsack.value(),
+                        knapsack.max_weight())
+    pos = numpy.random.randint(0, len(neighbor.objects()) - 1)
+    old_obj = neighbor.objects()[pos]
+    index = numpy.random.choice(len(objects))
+    obj = objects[index]
+    while (neighbor.weight() - old_obj[0] + obj[0]) > neighbor.max_weight():
+        pos = numpy.random.randint(0, len(neighbor.objects()) - 1)
+        old_obj = neighbor.objects()[pos]
+        index = numpy.random.choice(len(objects))
+        obj = objects[index]
+    neighbor.objects()[pos] = obj
+    neighbor.weight(neighbor.weight() - old_obj[0] + obj[0])
+    neighbor.value(neighbor.value() - old_obj[1] + obj[1])
+
+    return neighbor
+
+
+def sa_acceptance_probability(old_cost, new_cost, temperature):
+    """
+    Calculates the probability that a move will be accepted given the old and
+    new costs and temperature
+
+    :param old_cost: The current cost of the knapsack
+    :param new_cost: The next cost of the knapsack
+    :param temperature: The temperature of the algorithm at this time
+    :return: The probability that we will accept the new solution
+    """
+    return math.exp(float(float((old_cost - new_cost)) / float(temperature)))
+
+
+# ------------------------------------------------------------------------------
 # Algorithm implementation
 #
-def sa_knapsack(objects, max_weight):
+def sa_knapsack(objects, max_weight, costfun=sa_cost_value):
     """
     Solves the knapsack problem using the simulated annealing algorithm.
 
@@ -140,6 +217,26 @@ def sa_knapsack(objects, max_weight):
     :return: A knapsack object containing the solution
     """
 
+    # Generate a knapsack
+    solution = Knapsack(max_weight=max_weight)
+    solution.fill(objects, pack=True)
+    old_cost = costfun(solution)
+    temperature = 1.0
+    temp_min = 0.00001
+    alpha = 0.9
+    while temperature > temp_min:
+        i = 0
+        while i < 1000:
+            new_solution = sa_neighbor(solution, objects)
+            new_cost = costfun(new_solution)
+            ap = sa_acceptance_probability(old_cost, new_cost, temperature)
+            if ap > random.random():
+                solution = new_solution
+                old_cost = new_cost
+            i += 1
+        temperature *= alpha
+    return solution
+
     return None
 
 
@@ -148,8 +245,9 @@ def sa_knapsack(objects, max_weight):
 # RUN THE PROGRAM
 #
 def main():
+    logging.getLogger("sa_alg")
     max_weight, objects = parse_knapsack("./data.txt")
-    solution = sa_knapsack(objects, max_weight)
+    solution = sa_knapsack(objects, max_weight, costfun=sa_cost_weight)
     print str(solution)
 
 
