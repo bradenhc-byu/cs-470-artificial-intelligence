@@ -88,7 +88,7 @@ public class CustomAlgorithm implements IRepeatedGameAlgorithm {
             }
         }
         // If more than one pareto optimal solution exists, return the one that maximizes the player's score
-        String solution = "";
+        String solution;
         if(paretoSolutions.size() > 1){
             solution = getMove(paretoSolutions.get(0), gameModel, possibleMoves);
         }
